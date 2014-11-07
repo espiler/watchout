@@ -22,6 +22,9 @@
         .attr('fill','red')
         .attr('cy',function(){ return Math.random() * window.innerHeight})
         .attr('cx',function(){ return Math.random()*window.innerWidth});
+
+      moveCircles();
+      setInterval(moveCircles,3000);
     </script>
   </body>
 </html>
