@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel='stylesheet' type='css' href='styles.css'> 
+    <link rel='stylesheet' type='css' href='styles.css'>
+    <script src="d3.js" charset="utf-8"></script>
+    <!-- <script src='vid.js'></script> -->
+    <script src='watchout.js'></script>
   </head>
   <body>
     <div class="scoreboard">
@@ -10,8 +13,15 @@
       <div class="current">Current score: <span>0</span></div>
       <div class="collisions">Collisions: <span>0</span></div>
     </div>
-    <script src="d3.js" charset="utf-8"></script>
-    <script src='vid.js'></script>
-    <script src='watchout.js'></script>
+    <svg width='100%' height='1000px'></svg>
+    <script type='text/javascript'>
+      var circles = new Array(30);
+      d3.select('svg').selectAll('circle')
+        .data(circles).enter().append('circle')
+        .attr('r',15)
+        .attr('fill','red')
+        .attr('cy',function(){ return Math.random() * window.innerHeight})
+        .attr('cx',function(){ return Math.random()*window.innerWidth});
+    </script>
   </body>
 </html>
