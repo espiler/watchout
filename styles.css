@@ -9,3 +9,19 @@ Feel free to use it if you like. */
   cursor: arrow;
 
 }
+
+.enemy {
+  position: absolute;
+  transform-origin: 50% 50%;
+  -webkit-animation-name: spin;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-timing-function: linear;
+  -webkit-animation-iteration-count: infinite;
+}
+
+
+
+@-webkit-keyframes spin {
+  from { -webkit-transform: rotate(0deg);}
+  to {-webkit-transform: rotate(360deg);}
+}

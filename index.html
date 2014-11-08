@@ -18,13 +18,16 @@
     </svg>
     <script type='text/javascript'>
       var circles = new Array(30);
-      d3.select('svg').selectAll('circle')
-        .data(circles).enter().append('circle')
+      d3.select('svg').selectAll('image')
+        .data(circles).enter().append('image')
         .classed({'enemy':true})
-        .attr('r',15)
-        .attr('fill','red')
-        .attr('cy',function(){ return Math.random() * window.innerHeight})
-        .attr('cx',function(){ return Math.random()*window.innerWidth});
+        //.attr('r',15)
+        //.attr('fill','red')
+        .attr("xlink:href",'noid.png')
+        .attr("height", "45px")
+        .attr("width", "45px")
+        .attr('y',function(){ return Math.random() * window.innerHeight})
+        .attr('x',function(){ return Math.random()*window.innerWidth});
 
       d3.select('.player').attr('cy', window.innerHeight*0.5)
                           .attr('cx', window.innerWidth*0.5)

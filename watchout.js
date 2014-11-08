@@ -20,8 +20,8 @@ var moveCircles = function(){
   .tween("position", function() {
       var enemy = d3.select(this)
       var that = this;
-      var xPos = d3.interpolate(enemy.attr('cx'), Math.random()*window.innerWidth);
-      var yPos = d3.interpolate(enemy.attr('cy'), Math.random()*window.innerHeight);
+      var xPos = d3.interpolate(enemy.attr('x'), Math.random()*window.innerWidth);
+      var yPos = d3.interpolate(enemy.attr('y'), Math.random()*window.innerHeight);
       return function(t) {
         var enemy = d3.select(that)
         if(checkCollision(enemy) && !recentColl){
@@ -31,7 +31,7 @@ var moveCircles = function(){
             recentColl = false;
           },500)
         }
-        enemy.attr('cx', xPos(t)).attr('cy', yPos(t))
+        enemy.attr('x', xPos(t)).attr('y', yPos(t))
       };
     });
 };
@@ -40,8 +40,8 @@ var checkCollision = function(enemy) {
   var player = d3.selectAll('.player')
   var playX = player.attr('cx');
   var playY = player.attr('cy');
-  var enemX = enemy.attr('cx');
-  var enemY = enemy.attr('cy');
+  var enemX = enemy.attr('x');
+  var enemY = enemy.attr('y');
   var distance = Math.sqrt(Math.pow((playX-enemX),2) + Math.pow((playY-enemY),2));
   if (distance <= 2*player.attr('r')) {
     return true;
@@ -52,7 +52,6 @@ var checkCollision = function(enemy) {
 var onCollision = function() {
   //check if new high score
   if(timer > highScore){
-    debugger;
     highScore = timer;
     d3.select('.high span').text(highScore);
   }
