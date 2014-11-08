@@ -38,7 +38,7 @@ var checkCollision = function(enemy) {
   var enemX = enemy.attr('cx');
   var enemY = enemy.attr('cy');
   var distance = Math.sqrt(Math.pow((playX-enemX),2) + Math.pow((playY-enemY),2));
-  if (distance <= player.attr('r')) {
+  if (distance <= 2*player.attr('r')) {
     // console.log('Hitt!!!')
     return true;
   }
@@ -47,8 +47,17 @@ var checkCollision = function(enemy) {
 
 var onCollision = function() {
   //check if new high score
-    //update high score
+  if(timer > highScore){
+    debugger;
+    highScore = timer;
+    d3.select('.high span').text(highScore);
+  }
+  //update collsion count
+  collisions++;
+  d3.select('.collisions span').text(collisions);
+
   //reset timer
-  //update collsion count?
+  timer = 0;
+  d3.select('.current span').text(timer);
 }
 
