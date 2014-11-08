@@ -5,6 +5,7 @@
 var highScore = 0;
 var collisions = 0;
 var timer = 0;
+var recentColl = false;
 
 var incTimer = function(){
   timer++;
@@ -23,8 +24,12 @@ var moveCircles = function(){
       var yPos = d3.interpolate(enemy.attr('cy'), Math.random()*window.innerHeight);
       return function(t) {
         var enemy = d3.select(that)
-        if(checkCollision(enemy)){
+        if(checkCollision(enemy) && !recentColl){
           onCollision();
+          recentColl = true;
+          setTimeout(function(){
+            recentColl = false;
+          },500)
         }
         enemy.attr('cx', xPos(t)).attr('cy', yPos(t))
       };
@@ -39,7 +44,6 @@ var checkCollision = function(enemy) {
   var enemY = enemy.attr('cy');
   var distance = Math.sqrt(Math.pow((playX-enemX),2) + Math.pow((playY-enemY),2));
   if (distance <= 2*player.attr('r')) {
-    // console.log('Hitt!!!')
     return true;
   }
   return false;
