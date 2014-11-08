@@ -14,25 +14,34 @@ var moveCircles = function(){
       var yPos = d3.interpolate(enemy.attr('cy'), Math.random()*window.innerHeight);
       return function(t) {
         var enemy = d3.select(that)
-          enemy.attr('cx', xPos(t)).attr('cy', yPos(t))
+        if(checkCollision(enemy)){
+          onCollision();
+        }
+        enemy.attr('cx', xPos(t)).attr('cy', yPos(t))
       };
     });
 };
 
-var checkCollision = function() {
+var checkCollision = function(enemy) {
   var player = d3.selectAll('.player')
   var playX = player.attr('cx');
   var playY = player.attr('cy');
-  var enemX = this.attr('cx');
-  var enemY = this.attr('cy');
+  var enemX = enemy.attr('cx');
+  var enemY = enemy.attr('cy');
   var distance = Math.sqrt(Math.pow((playX-enemX),2) + Math.pow((playY-enemY),2));
   if (distance <= player.attr('r')) {
+    // console.log('Hitt!!!')
     return true;
   }
   return false;
 }
 
-var onCollision = function() {}
+var onCollision = function() {
+  //check if new high score
+    //update high score
+  //reset timer
+  //update collsion count?
+}
 
 d3.select(".enemy").transition()
   .duration(3000)
