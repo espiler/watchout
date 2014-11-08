@@ -26,13 +26,16 @@
         .attr('cy',function(){ return Math.random() * window.innerHeight})
         .attr('cx',function(){ return Math.random()*window.innerWidth});
 
-        var player = d3.selectAll('.player');
+      var player = d3.selectAll('.player');
 
-        var drag = d3.behavior.drag()
-           .on('drag', function() { player.attr('cx', d3.event.x)
-                                          .attr('cy', d3.event.y); })
+      var drag = d3.behavior.drag()
+         .on('drag', function() { player.attr('cx', d3.event.x)
+                                        .attr('cy', d3.event.y); })
 
       d3.selectAll('.player').call(drag);
+
+      var enemies = d3.selectAll('.enemy');
+
 
       moveCircles();
       setInterval(moveCircles,3000);
