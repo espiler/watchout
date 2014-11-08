@@ -36,9 +36,12 @@
 
       var enemies = d3.selectAll('.enemy');
 
+      d3.select('.high span').text(highScore);
+      d3.select('.collisions span').text(collisions);
 
       moveCircles();
       setInterval(moveCircles,3000);
+      setInterval(incTimer,50);
     </script>
   </body>
 </html>

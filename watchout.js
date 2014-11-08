@@ -2,6 +2,15 @@
 //
 //
 
+var highScore = 0;
+var collisions = 0;
+var timer = 0;
+
+var incTimer = function(){
+  timer++;
+  d3.select('.current span').text(timer);
+};
+
 var circles = new Array(30);
 
 var moveCircles = function(){
@@ -42,7 +51,4 @@ var onCollision = function() {
   //reset timer
   //update collsion count?
 }
-
-d3.select(".enemy").transition()
-  .duration(3000)
 
