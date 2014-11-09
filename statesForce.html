@@ -3,12 +3,15 @@
 <style>
 
 rect {
-  fill: none;
   pointer-events: all;
 }
 
+svg{
+  border: 3px solid black;
+}
+
+
 .node {
-  fill: #000;
 }
 
 .cursor {
@@ -23,30 +26,87 @@ rect {
 
 </style>
 <body>
+<div class="scoreboard">
+  <!-- Modify the scoreboard when important events occur in your game! -->
+  <div class="best">Best score: <span>None yet!</span></div>
+  <div class="attempts">Attempts on this level: <span>0</span></div>
+</div>
+
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
+var settings = {
+  width: 1000,
+  height: 600,
+  boardGrav: 0,
+  pullForce: 0.02,
+  holeCharge: 1000,
+  friction: 0.98,
+  playerR: 5
+}
 
-var width = 960,
-    height = 500;
+
+var attempts = 0;
+var bestScore = Infinity;
+
+var incAttempts = function(){
+  attempts++;
+  d3.select('.attempts span').text(attempts);
+};
+
+var win = function() {
+  if (bestScore > attempts && attempts !== 0) {
+    bestScore = attempts;
+    d3.select('.best span').text(bestScore);
+  }
+  attempts = 0;
+  d3.select('.attempts span').text(attempts);
+}
+
 
 var fill = d3.scale.category20();
 
 var force = d3.layout.force()
-    .size([width, height])
-    .nodes([{}]) // initialize with a single node
-    .charge(-10)
-    .gravity(0)
+    .size([settings.width, settings.height])
+    .nodes([{x: 200, y: 150, charge: settings.holeCharge*4, r:40, fill:'black', enemy:true,  xTrue: 200, yTrue:150},
+      {x: 650, y: 300, charge: settings.holeCharge*5, r:50, fill:'black', enemy:true,
+      xTrue: 650, yTrue:300}
+    ]) // initialize with a single node
+    .charge(function(d, i) { return d.charge })
+    .gravity(settings.gravity)
+    .friction(settings.friction)
     .on("tick", tick);
 
 var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height)
+    .attr("width", settings.width)
+    .attr("height", settings.height)
     .on("mousemove", mousemove)
     .on("mousedown", mousedown);
 
 svg.append("rect")
-    .attr("width", width)
-    .attr("height", height);
+    .attr("width", settings.width)
+    .attr("height", settings.height)
+    .attr("fill", "none");
+
+var goalRect = svg.append("rect")
+    .attr("x", 100)
+    .attr("y", 570)
+    .attr("fill", "green")
+    .attr("width", 60)
+    .attr("height", 30)
+    .attr("class", "goal");
+
+
+
+moveGoal();
+
+function moveGoal(){
+ goalRect.transition().duration(3000).ease('linear')
+   .attr('x',900)
+   .transition().duration(3000).ease('linear')
+   .attr('x',100)
+   .each('end',moveGoal);
+}
+
 
 var nodes = force.nodes(),
     //links = force.links(),
@@ -58,7 +118,16 @@ var cursor = svg.append("circle")
     .attr("transform", "translate(-100,-100)")
     .attr("class", "cursor");
 
+node = node.data(nodes);
+node.enter().insert('circle')
+      .attr('class','enemy')
+      .attr("r", function(d) {return d.r ? d.r :  settings.playerR })
+      .attr("fill", function(d) {return d.fill ? d.fill : "blue" })
+      .attr("cx", function(d) {return d.x})
+      .attr("cy", function(d) {return d.y})
 restart();
+
+
 
 function mousemove() {
   cursor.attr("transform", "translate(" + d3.mouse(this) + ")");
@@ -66,9 +135,10 @@ function mousemove() {
 
 function mousedown() {
   var point = d3.mouse(this),
-      node = {x: point[0], y: 50},
+      node = {x: point[0], y: 0, charge: 0},
       //placed point with specific charge datum
       n = nodes.push(node);
+      incAttempts();
 
 
   restart();
@@ -77,11 +147,26 @@ function mousedown() {
 function tick(e) {
   var ky = e.alpha;
   nodes.forEach(function(d, i) {
-    d.y += (690 - d.y) * 0.03 * ky;
-  });
+    if (d.enemy) {
+        d.y = d.yTrue;
+        d.x = d.xTrue;
+    }
+    if (!d.enemy) {
+      d.y += (700 - d.y) * settings.pullForce * ky;
+    }
 
-  node.attr("cx", function(d) { return d.x; })
-      .attr("cy", function(d) { return d.y; });
+    if(d.x > settings.width+2 || d.y > settings.height+2 || d.x < -2 || d.y < -2){
+      //remove d from node
+      nodes.splice(nodes.indexOf(d),1)
+      node = node.data(nodes);
+      node.exit().remove();
+    }
+
+    node.attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; });
+  });
+  checkGoal();
+  checkDeath();
 }
 
 function restart() {
@@ -90,10 +175,56 @@ function restart() {
 
   node.enter().insert("circle", ".cursor")
       .attr("class", "node")
-      .attr("r", 5)
+      .attr("r", function(d) {return d.r ? d.r : settings.playerR })
+      .attr("fill", function(d) {return d.fill ? d.fill : "blue" })
+      .attr("cx", function(d) {return d.x})
+      .attr("cy", function(d) {return d.y})
       .call(force.drag);
 
   force.start();
 }
 
+function checkGoal() {
+  var goal = d3.select('.goal');
+  nodes.forEach(function(obj) {
+    var goalTop = parseInt(goal.attr('y')) + goal.attr("height")/2
+    var goalRight = parseInt(goal.attr('x')) + goal.attr("width")/2
+    var goalLeft = parseInt(goal.attr('x')) - goal.attr("width")/2
+    if (obj.y + settings.playerR > goalTop && obj.x + settings.playerR > goalLeft &&
+      obj.x + settings.playerR < goalRight ) {
+      win();
+    }
+  })
+}
+
+function checkDeath(){
+  var enemies = d3.selectAll('.enemy');
+  nodes.forEach(function(obj) {
+    enemies.forEach(function(enem){
+        //enem = d3.select(enem)
+        var x = (obj.x - enem.xTrue)
+        var y = (obj.y - enem.yTrue)
+        var dist = Math.sqrt( x*x + y*y);
+        if(dist < obj.r + enem.r) {
+          nodes.splice(nodes.indexOf(obj),1)
+          node = node.data(nodes);
+          node.exit().remove();
+        }
+    })
+  })
+}
+
+
+
+
+
+
+
+
+
+
 </script>
+
+
+
+
